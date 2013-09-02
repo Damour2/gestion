@@ -1308,9 +1308,9 @@ input.activo, select.activo, input.disabled { background:@fondo; }
 	}
 }
 
-#cheques-in, #retenciones-in {
+#cheques-in, #retenciones-in, #balances-in {
 
-	#buscar_cheques {
+	#buscar_cheques { 
 		background: @azul;
 		width: 100%;
 	}
@@ -1415,5 +1415,57 @@ input.activo, select.activo, input.disabled { background:@fondo; }
 
 	input {
 		width: 300px;
+	}
+}
+
+
+#balances-in {
+	.media_columna {
+		width: 48%;
+		margin-left: 4%;
+		float: left;
+
+		&:first-child {
+			margin: 0;
+		} 
+
+		h3 {
+			background: @rojo;
+		}
+		div.linea {
+			padding-bottom: 5px;
+			border-bottom: 1px #ccc solid;
+			margin-bottom: 5px;
+
+			span { float: left; 
+					position: static;
+					width: auto;
+
+					&.importe {
+						float: right;
+					}
+					&.nombre {
+						margin-left: 5px;
+					}
+					&.iva {
+						position: absolute;
+						left: 300px;
+					}
+				}
+
+				.nombre_cli {
+					display: block;
+					clear: left;
+				}
+
+			&.header {
+				span {
+					margin-top: 3px;
+					&.importe {
+						margin-right: 10px;
+					}
+				}
+			}
+		}
 	}
 }

@@ -1,12 +1,21 @@
-<div class='recuadro' id='buscar_cheques'>
+<div class='recuadro azul' id='buscar_cheques'>
 	<h2>Buscar retenciones</h2>
 	<form id='datos'>
-		<label>Fuente: </label>
+		<label>IVA Compras: </label>
 		<select id='fuente' name='fuente'>
-			<option value=''>De cualquier fuente</option>
-			<option value='cliente'>Retenido en compras de clientes</option>
-			<option value='proveedor'>Retenido en pagos a proveedores</option>
+			<option value='2'>Con IVA discriminado</option>
+			<option value='0'>No oplica</option>
+			<option value='-1'>Todos</option>
 		</select>
+		<label>IVA Ventas: </label>
+		<select id='venta' name='venta'>
+			<option value='3'>Con IVA discriminado e incluido (A y B)</option>
+			<option value='2'>Con IVA discriminado (A)</option>
+			<option value='1'>Con IVA incluido (B)</option>
+			<option value='0'>Sin IVA</option>
+			<option value='-1'>Todos</option>
+		</select>
+		<br>
 			<label>Desde:</label>
 			<input id='de_fecha' name='de_fecha' value='<?=date('d-m-Y', time() - 60 * 60 * 24 * 30)?>'>
 			<label>Hasta:</label>
@@ -29,8 +38,9 @@
 		});
 
 
-		$('a.buscar').click(function() {
-			var datos = 'accion=listados&que=retenciones&' + $('#datos input, #datos select').serialize();
+		$('a.buscar').click(function(e) {
+			e.stopImmediatePropagation();
+			var datos = 'accion=listados&que=movimiento&' + $('#datos input, #datos select').serialize();
 			$.get('api.php?' + datos, function(d) {
 				$('#resultados').html(d);
 			})

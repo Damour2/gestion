@@ -581,6 +581,88 @@ class Movimiento extends Items {
 		return ($paraDeshacer) ? -$cantidad : $cantidad;
 	}
 	
+
+
+	public function listados($params) {
+		// print_r($params);
+		$desde = Utils::dmy2ymd($params[de_fecha]);
+		$hasta = Utils::dmy2ymd($params[hasta_fecha]);
+		switch ($params[fuente]) {
+		    case 0:
+		        $ivaCompras = "AND iva_movimiento = 0";
+		        break;
+		    case 1:
+		        $ivaCompras = "AND iva_movimiento = 1";
+		        break;
+		    case 2:
+		        $ivaCompras = "AND iva_movimiento = 2";
+		        break;
+		    case -1:
+		        $ivaCompras = "";
+		        break;
+		}
+
+		switch ($params[venta]) {
+		    case 0:
+		        $ivaVentas = "AND iva_movimiento = 0";
+		        break;
+		    case 1:
+		        $ivaVentas = "AND iva_movimiento = 1";
+		        break;
+	       case 2:
+		        $ivaVentas = "AND iva_movimiento = 2";
+		        break;
+		    case 3:
+		        $ivaVentas = "AND iva_movimiento > 0";
+		        break;
+		    case -1:
+		        $ivaVentas = "";
+		        break;
+		}
+
+
+
+		$consulta = "SELECT a.*, b.nombre as nombre_cli FROM movimientos a LEFT JOIN clientes b USING (id_cli) WHERE fecha >= '$desde 00:00:00' AND fecha <= '$hasta 00:00:00' AND a.tipo = 'compra' AND ((status = 'cliente' $ivaVentas) OR (status = 'proveedor' $ivaCompras)) ORDER BY fecha ASC";
+		// echo $consulta;
+		$q = mysql_query($consulta) or die(mysql_error());
+		$compras = array();
+		$ventas = array();
+		$totales = array();
+		while ($r = mysql_fetch_assoc($q)) {
+			if ($r[iva_movimiento] == 1) {
+
+				$r[iva] = $r[total] / 1.21 * 0.21;
+				$r[comprobante] = "FC B";
+			}
+			elseif ($r[iva_movimiento] == 2) {
+				$r[iva] = $r[total] / 1.21 * 0.21;
+				$r[comprobante] = "FC A";
+			}
+			else {
+				$r[comprobante] = "SIN FC";
+				$r[iva] = 0;
+			}
+
+			if ($r[status] == 'cliente') {
+				$ventas[] = $r;
+				$totales[ventas] += $r[total]; 
+				$totales[ivaVentas] += $r[iva]; 
+			} else {
+				$compras[] = $r;
+				$totales[compras] += $r[total]; 
+				$totales[ivaCompras] += $r[iva]; 
+			}
+
+		}
+		// print_r($totales);
+		$this->smarty->assign('totales', $totales);
+		$this->smarty->assign('ventas', $ventas);
+		$this->smarty->assign('compras', $compras);
+		// $this->smarty->debugging = true;
+		$this->smarty->display('balances.tpl');
+
+	}
+
 }
 
 
